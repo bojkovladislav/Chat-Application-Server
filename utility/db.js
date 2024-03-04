@@ -1,14 +1,14 @@
 import 'dotenv/config';
 import admin from 'firebase-admin';
-import serviceAccount from '../serviceAccountKey.json' assert { type: 'json' };
+// import serviceAccount from '../serviceAccountKey.json' assert { type: 'json' };
 
-const { AUTH_DOMAIN } = process.env;
+const { AUTH_DOMAIN, CLIENT_EMAIL, PRIVATE_KEY, PROJECT_ID } = process.env;
 
 admin.initializeApp({
   credential: admin.credential.cert({
-    clientEmail: serviceAccount.client_email,
-    privateKey: serviceAccount.private_key,
-    projectId: serviceAccount.project_id,
+    clientEmail: CLIENT_EMAIL,
+    privateKey: PRIVATE_KEY,
+    projectId: PROJECT_ID,
   }),
   databaseURL: `https://${AUTH_DOMAIN}`,
 });
