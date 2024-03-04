@@ -1,4 +1,4 @@
-import CRUD from '../helpers/crudoperations.js';
+import CRUD from '../helpers/crudOperations.js';
 import admin from 'firebase-admin';
 
 const crudMessages = new CRUD('Messages');

@@ -1,5 +1,5 @@
 import ApiError from '../exceptions/api.error.js';
-import CRUD from '../helpers/crudoperations.js';
+import CRUD from '../helpers/crudOperations.js';
 import { usersServices } from './users.service.js';
 import { messagesService } from './messages.service.js';
 import admin from 'firebase-admin';
