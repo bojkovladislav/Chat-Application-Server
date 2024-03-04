@@ -1,7 +1,7 @@
 import express from 'express';
 import { catchError } from '../middlewares/catchError.js';
 import { checkDefaultParams } from '../helpers/businessHelpers.js';
-import CRUD from '../helpers/crudoperations.js';
+import CRUD from '../helpers/crudOperations.js';
 
 export const roomsRouter = express.Router();
 
