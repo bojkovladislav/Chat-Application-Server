@@ -1,6 +1,6 @@
 import ApiError from '../exceptions/api.error.js';
 import { checkDefaultParams } from '../helpers/businessHelpers.js';
-import CRUD from '../helpers/crudoperations.js';
+import CRUD from '../helpers/crudOperations.js';
 import { usersServices } from '../services/users.service.js';
 
 const getFilteredUsers = async (req, res) => {

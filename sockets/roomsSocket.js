@@ -1,4 +1,4 @@
-import CRUD from '../helpers/crudoperations.js';
+import CRUD from '../helpers/crudOperations.js';
 
 function handleRoomsEvent(socket) {
   socket.on('get_rooms', async (arrayOfIds, typeOfRooms = 'all') => {
