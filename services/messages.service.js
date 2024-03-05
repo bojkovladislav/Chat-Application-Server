@@ -29,6 +29,7 @@ const getMessages = async (roomId) => {
   const messagesDoc = await crudMessages.getById(roomId);
 
   if (!messagesDoc.exists) {
+
     return null;
   }
 

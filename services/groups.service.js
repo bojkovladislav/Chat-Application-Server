@@ -6,8 +6,11 @@ import admin from 'firebase-admin';
 
 const crudGroups = new CRUD('Groups');
 
-const createGroup = async (userId, newGroup) => {
-  await usersServices.addNewRoomId(userId, newGroup.id);
+const createGroup = async (memberIds, newGroup) => {
+  for await (const memberId of memberIds) {
+    await usersServices.addNewRoomId(memberId, newGroup.id);
+  }
+
   await messagesService.createMessages(newGroup.id);
 
   return crudGroups.create(newGroup, newGroup.id);

@@ -14,18 +14,29 @@ const { PORT, ORIGIN } = process.env;
 
 const app = express();
 const server = createServer(app);
+
+app.use(
+  cors({
+    origin: ORIGIN,
+    credentials: true,
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Content-Length',
+      'X-Requested-With',
+    ],
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS'],
+  })
+);
+
 const io = new Server(server, {
   cors: {
     origin: ORIGIN,
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS'],
   },
 });
 
 app.use(express.json());
-app.use(
-  cors({
-    origin: ORIGIN,
-  })
-);
 
 app.use('/private-rooms', privateRoomsRouter);
 app.use('/groups', groupsRouter);

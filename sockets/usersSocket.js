@@ -41,7 +41,7 @@ function handleUserEvents(socket) {
 
       socket.emit('user_got', user);
     } catch (error) {
-      throw new Error('Failed to get user!');
+      socket.emit('user_got', null);
     }
   });
 
@@ -70,7 +70,6 @@ function handleUserEvents(socket) {
       throw new Error(`Failed to update user ${field}!`);
     }
   });
-  console.log('Joined');
 }
 
 export const usersSocket = {

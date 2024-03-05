@@ -21,13 +21,17 @@ function messagesEventHandler(socket) {
   socket.on('get_messages', async (roomId) => {
     try {
       const encryptedMessages = await messagesService.getMessages(roomId);
-      const decryptedMessages = {
-        ...encryptedMessages,
-        messages: encryptedMessages.messages.map((msg) => decrypt(msg)),
-      };
+      const decryptedMessages =
+        encryptedMessages !== null
+          ? {
+              ...encryptedMessages,
+              messages: encryptedMessages.messages.map((msg) => decrypt(msg)),
+            }
+          : null;
 
       socket.emit('messages_got', decryptedMessages);
     } catch (error) {
+      console.log(error);
       throw new Error('Failed to get messages!');
     }
   });

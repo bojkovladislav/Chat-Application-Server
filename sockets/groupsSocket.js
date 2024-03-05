@@ -2,31 +2,39 @@ import { v4 as uuid } from 'uuid';
 import { groupsService } from '../services/groups.service.js';
 import { handleGetRandomColor } from '../helpers/businessHelpers.js';
 import { groupColors } from '../utility/constans.js';
+import { usersServices } from '../services/users.service.js';
 
 function handleGroupsEvent(socket) {
-  socket.on(
-    'create_group',
-    async (name, creators, members, isPublic, userId) => {
-      try {
-        const newGroup = {
-          id: uuid(),
-          name,
-          avatar: handleGetRandomColor(groupColors),
-          creators,
-          members,
-          isPublic,
-        };
+  socket.on('create_group', async (name, creators, memberIds, isPublic) => {
+    try {
+      const newGroup = {
+        id: uuid(),
+        name,
+        avatar: handleGetRandomColor(groupColors),
+        creators,
+        members: memberIds,
+        isPublic,
+      };
 
-        socket.emit('send_group', newGroup);
+      socket.emit('send_group', newGroup);
 
-        await groupsService.createGroup(userId, newGroup);
+      for (const memberId of memberIds) {
+        if (memberId !== creators[0]) {
+          const user = await usersServices.getUserById(memberId);
 
-        socket.emit('group_created', newGroup);
-      } catch (error) {
-        throw new Error('Failed to create group! Please try again later!');
+          socket.to(user.socketId).emit('send_group', newGroup);
+          socket.to(user.socketId).emit('group_created', newGroup);
+        }
       }
+
+      await groupsService.createGroup(memberIds, newGroup, socket);
+
+      socket.emit('group_created', newGroup);
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to create group! Please try again later!');
     }
-  );
+  });
 
   socket.on('get_groups', async (arrayOfIds) => {
     try {
@@ -41,13 +49,22 @@ function handleGroupsEvent(socket) {
   socket.on('delete_group', async (group, userId, forEveryone) => {
     try {
       if (forEveryone) {
+        for (const memberId of group.members) {
+          if (memberId !== group.creators[0]) {
+            const user = await usersServices.getUserById(memberId);
+
+            socket.to(user.socketId).emit('group_deleted', group.id);
+
+            await groupsService.deleteGroupForSelf(memberId, group.id);
+          }
+        }
+
         await groupsService.deleteGroupForEveryone(userId, group.id);
       } else {
         await groupsService.deleteGroupForSelf(userId, group.id);
       }
-
-      socket.emit('group_deleted', group.id);
     } catch (error) {
+      console.log(error);
       throw new Error('Failed to delete group! Try again later!');
     }
   });
