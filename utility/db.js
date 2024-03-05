@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import admin from 'firebase-admin';
-// import serviceAccount from '../serviceAccountKey.json' assert { type: 'json' };
 
 const { AUTH_DOMAIN, CLIENT_EMAIL, PRIVATE_KEY, PROJECT_ID } = process.env;
 
