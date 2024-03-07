@@ -1,5 +1,6 @@
 import CRUD from '../helpers/crudOperations.js';
 import admin from 'firebase-admin';
+import { decrypt, encrypt } from '../helpers/encrypionHelpers.js';
 
 const crudMessages = new CRUD('Messages');
 
@@ -29,7 +30,6 @@ const getMessages = async (roomId) => {
   const messagesDoc = await crudMessages.getById(roomId);
 
   if (!messagesDoc.exists) {
-
     return null;
   }
 
@@ -50,13 +50,15 @@ const deleteMessages = (roomId) => {
 };
 
 const deleteMessage = async (roomId, messageId) => {
-  const data = (await crudMessages.getById(roomId)).data();
-  const { messages } = data;
+  const data = await crudMessages.getById(roomId);
+  const { messages } = data.data();
 
-  if (messages.some((message) => message.id === messageId)) {
-    const updatedMessages = messages.filter(
-      (message) => message.id !== messageId
-    );
+  const decryptedMessages = messages.map(decrypt);
+
+  if (decryptedMessages.some((message) => message.id === messageId)) {
+    const updatedMessages = decryptedMessages
+      .filter((message) => message.id !== messageId)
+      .map(encrypt);
 
     await crudMessages.update(roomId, {
       messages: updatedMessages,
@@ -65,10 +67,12 @@ const deleteMessage = async (roomId, messageId) => {
 };
 
 const updateMessage = async (roomId, messageId, updatedMessage) => {
-  const data = (await crudMessages.getById(roomId)).data();
-  const { messages } = data;
+  const data = await crudMessages.getById(roomId);
+  const { messages } = data.data();
 
-  const updatedMessages = messages.map((msg) => {
+  const decryptedMessages = messages.map(decrypt);
+
+  const updatedMessages = decryptedMessages.map((msg) => {
     if (msg.id === messageId) {
       return {
         ...msg,
@@ -80,7 +84,7 @@ const updateMessage = async (roomId, messageId, updatedMessage) => {
   });
 
   await crudMessages.update(roomId, {
-    messages: updatedMessages,
+    messages: updatedMessages.map(encrypt),
   });
 };
 
