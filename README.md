@@ -1,4 +1,9 @@
 # Backend Side Of Chat Application
+<<<<<<< HEAD
+=======
+
+[Link To The Frontend Side](https://github.com/bojkovladislav/Chat-Application)
+>>>>>>> d9600c5ddb83a0e08aa57492569b83026fc10f15
 
 ## Overview
 
