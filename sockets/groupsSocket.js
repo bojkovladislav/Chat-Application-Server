@@ -11,6 +11,7 @@ function handleGroupsEvent(socket) {
         id: uuid(),
         name,
         avatar: handleGetRandomColor(groupColors),
+        description: '',
         creators,
         members: memberIds,
         isPublic,
@@ -31,7 +32,6 @@ function handleGroupsEvent(socket) {
 
       socket.emit('group_created', newGroup);
     } catch (error) {
-      console.log(error);
       throw new Error('Failed to create group! Please try again later!');
     }
   });
@@ -76,6 +76,77 @@ function handleGroupsEvent(socket) {
       await groupsService.updateMembers(groupId, userId);
     } catch (error) {
       throw new Error('Failed to update group members!');
+    }
+  });
+
+  socket.on('add_members', async (group, membersToAdd) => {
+    try {
+      for (const member of membersToAdd) {
+        const user = await usersServices.getUserById(member);
+
+        socket.to(user.socketId).emit('send_group', group);
+        socket.to(user.socketId).emit('group_created', group);
+        socket.emit('send_updated_group_members', group.id, member);
+        socket
+          .to(group.id)
+          .emit('send_updated_group_members', group.id, member);
+
+        await groupsService.updateMembers(group.id, member);
+        await usersServices.addNewRoomId(member, group.id);
+      }
+    } catch (error) {
+      throw new Error('Failed to add members!');
+    }
+  });
+
+  socket.on(
+    'update_group_credentials',
+    async (id, memberIds, originalGroupCred, changedGroupCred) => {
+      try {
+        const updatedCredentials = {
+          id,
+        };
+
+        for (const key in originalGroupCred) {
+          const updatedValue =
+            typeof changedGroupCred !== 'string'
+              ? changedGroupCred[key]
+              : changedGroupCred[key].trim();
+
+          updatedCredentials[key] = updatedValue;
+
+          if (originalGroupCred[key] !== updatedValue) {
+            await groupsService.updateField(id, key, updatedValue);
+          }
+        }
+
+        socket.emit('group_credentials_updated', updatedCredentials);
+
+        for (const memberId of memberIds) {
+          const user = await usersServices.getUserById(memberId);
+
+          socket
+            .to(user.socketId)
+            .emit('group_credentials_updated', updatedCredentials);
+        }
+      } catch (error) {
+        throw new Error("Failed to update group's credentials!");
+      }
+    }
+  );
+
+  socket.on('remove_member', async (groupId, memberId) => {
+    try {
+      const user = await usersServices.getUserById(memberId);
+
+      socket.emit('member_removed', groupId, memberId);
+      socket.to(groupId).emit('member_removed', groupId, memberId);
+      socket.to(user.socketId).emit('group_deleted', groupId);
+
+      await groupsService.removeMember(groupId, memberId);
+      await usersServices.removeRoomId(memberId, groupId);
+    } catch (error) {
+      throw new Error('Failed to remove a member!');
     }
   });
 }

@@ -30,6 +30,12 @@ const getGroup = async (id) => {
   return group._fieldsProto;
 };
 
+const removeMember = async (groupId, userId) => {
+  return crudGroups.update(groupId, {
+    members: admin.firestore.FieldValue.arrayRemove(userId),
+  });
+};
+
 const deleteGroupForSelf = async (userId, groupId) => {
   const user = await usersServices.getUserById(userId);
 
@@ -53,9 +59,9 @@ const addMember = async (groupId, userId) => {
   });
 };
 
-const removeMember = async (groupId, userId) => {
+const updateField = async (groupId, nameOfTheField, updatedValue) => {
   return crudGroups.update(groupId, {
-    members: admin.firestore.FieldValue.arrayRemove(userId),
+    [nameOfTheField]: updatedValue,
   });
 };
 
@@ -67,4 +73,5 @@ export const groupsService = {
   deleteGroupForSelf,
   updateMembers: addMember,
   removeMember,
+  updateField,
 };

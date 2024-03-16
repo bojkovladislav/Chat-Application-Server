@@ -6,7 +6,8 @@ import { userColors } from '../utility/constans.js';
 function handleUserEvents(socket) {
   socket.on('create_user', async (name) => {
     try {
-      const existingUser = await usersServices.getUserByName(name.trim());
+      const trimmedName = name.trim();
+      const existingUser = await usersServices.getUserByName(trimmedName);
 
       if (existingUser) {
         socket.emit('user_exists', existingUser);
@@ -18,7 +19,7 @@ function handleUserEvents(socket) {
       const newUser = {
         id: uuid(),
         socketId: socket.id,
-        name,
+        name: trimmedName,
         rooms: [],
         avatar: handleGetRandomColor(userColors),
         status: 'online',

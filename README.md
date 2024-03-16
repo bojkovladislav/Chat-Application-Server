@@ -1,4 +1,4 @@
-# Backend Side Of Chat Application 
+# Backend Side Of Chat Application
 
 ## Overview
 
@@ -40,7 +40,7 @@ The REST API serves as the primary interface for interacting with the backend se
 ### Features
 
 1. **User Authentication**: The REST API provides endpoints for user registration, login, and authentication using JSON Web Tokens (JWT).
-3. **User Management**: CRUD operations are supported for managing user profiles, including creating, updating, and deleting user accounts.
+2. **User Management**: CRUD operations are supported for managing user profiles, including creating, updating, and deleting user accounts.
 
 ### Implementation Details
 

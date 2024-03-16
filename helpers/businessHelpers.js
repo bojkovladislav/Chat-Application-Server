@@ -4,7 +4,7 @@ export function checkDefaultParams(params) {
   const arrayFromParams = Object.entries(params);
 
   if (arrayFromParams.length === 1 && arrayFromParams[0][1] === undefined) {
-    console.log('yes');
+    console.log(arrayFromParams);
     throw ApiError.badRequest(`You need to provide ${arrayFromParams[0][0]}!`);
   }
 
@@ -15,7 +15,7 @@ export function checkDefaultParams(params) {
   if (absentParams.length) {
     throw ApiError.badRequest(
       `You need to provide the following params:${[...absentParams]}`
-  );
+    );
   }
 }
 
